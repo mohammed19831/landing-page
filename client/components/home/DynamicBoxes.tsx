@@ -4,8 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { cn } from '@/lib/utils';
 import { bgStyleFrom } from '@/lib/background';
 import { useBoxesStore, BoxData, BoxLayout } from '@/state/boxes-store';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
+// CSS styles are handled in global.css
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 

@@ -187,7 +187,10 @@ export default function DynamicBoxesAdmin() {
         <BoxEditor
           boxId={editingBoxId}
           isOpen={!!editingBoxId}
-          onClose={() => setEditingBoxId(null)}
+          onClose={() => {
+            console.log('Closing BoxEditor'); // Debug log
+            setEditingBoxId(null);
+          }}
         />
       )}
 

@@ -61,7 +61,8 @@ function DynamicBox({
       className={cn(
         'group relative w-full h-full border bg-white transition focus:outline-none focus:ring-2 focus:ring-brand-600 disabled:cursor-not-allowed overflow-hidden',
         isEditMode && 'hover:ring-2 hover:ring-blue-400',
-        isSelected && 'ring-2 ring-blue-500'
+        isSelected && 'ring-2 ring-blue-500',
+        box.hidden && 'box-hidden'
       )}
       style={{
         ...bgStyleFrom(box.background as any),

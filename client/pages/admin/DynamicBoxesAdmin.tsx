@@ -39,8 +39,32 @@ export default function DynamicBoxesAdmin() {
   const hiddenCount = boxes.length - visibleBoxes.length;
 
   const handleAddBox = useCallback(() => {
+    console.log('Adding new box...'); // Debug log
     addBox();
   }, [addBox]);
+
+  const handleAddTestBox = useCallback(() => {
+    console.log('Adding test box with sample content...'); // Debug log
+    const { addBox, updateBox } = useBoxesStore.getState();
+    addBox();
+
+    // Get the newly added box and populate with test data
+    setTimeout(() => {
+      const boxes = useBoxesStore.getState().boxes;
+      const newBox = boxes[boxes.length - 1];
+      if (newBox) {
+        updateBox(newBox.id, {
+          title: 'Sample Content Box',
+          description: '<p>This is a <strong>sample box</strong> with rich text content. You can edit this content using the advanced editor.</p><ul><li>Feature 1</li><li>Feature 2</li><li>Feature 3</li></ul>',
+          type: 'mixed',
+          size: 'medium',
+          background: { kind: 'gradient', from: '#3b82f6', to: '#8b5cf6', direction: 'to bottom right' },
+          buttonLabel: 'Learn More',
+          ctaMode: 'both',
+        });
+      }
+    }, 100);
+  }, []);
 
   const handleEditModeToggle = useCallback((enabled: boolean) => {
     setEditMode(enabled);
@@ -74,10 +98,15 @@ export default function DynamicBoxesAdmin() {
               {visibleBoxes.length} visible
               {hiddenCount > 0 && ` • ${hiddenCount} hidden`}
             </Badge>
-            <AdminButton onClick={handleAddBox}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Box
-            </AdminButton>
+            <div className="flex gap-2">
+              <AdminButton onClick={handleAddBox}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Box
+              </AdminButton>
+              <AdminButton onClick={handleAddTestBox} variant="outline">
+                Add Test Box
+              </AdminButton>
+            </div>
           </div>
         }
       />

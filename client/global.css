@@ -24,35 +24,94 @@
   transition-property: transform;
 }
 
+/* Enhanced Resize Handles */
 .react-grid-item > .react-resizable-handle {
   position: absolute;
+  background-color: rgba(59, 130, 246, 0.6);
+  border: 2px solid #3b82f6;
+  z-index: 100;
+  transition: all 0.2s ease;
+}
+
+/* Bottom-right corner handle */
+.react-grid-item > .react-resizable-handle.react-resizable-handle-se {
   width: 20px;
   height: 20px;
   bottom: 0;
   right: 0;
-  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxnIGZpbGw9IiM0NDQiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbC1vcGFjaXR5PSIuMyI+PHBhdGggZD0iTTYgNkgwVjRoNHYyeiIvPjxwYXRoIGQ9Ik02IDZWMEg0djRoMnoiLz48L2c+PC9zdmc+');
-  background-position: bottom right;
-  padding: 0 3px 3px 0;
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  box-sizing: border-box;
   cursor: se-resize;
+  border-radius: 6px 0 6px 0;
 }
 
-.react-grid-item > .react-resizable-handle::after {
-  content: '';
-  position: absolute;
-  right: 3px;
-  bottom: 3px;
-  width: 5px;
-  height: 5px;
-  border-right: 2px solid rgba(0, 0, 0, 0.4);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+/* Edge handles */
+.react-grid-item > .react-resizable-handle.react-resizable-handle-e {
+  width: 8px;
+  height: calc(100% - 20px);
+  right: 0;
+  top: 10px;
+  cursor: e-resize;
+  border-radius: 4px 0 0 4px;
 }
 
+.react-grid-item > .react-resizable-handle.react-resizable-handle-s {
+  width: calc(100% - 20px);
+  height: 8px;
+  bottom: 0;
+  left: 10px;
+  cursor: s-resize;
+  border-radius: 4px 4px 0 0;
+}
+
+.react-grid-item > .react-resizable-handle.react-resizable-handle-w {
+  width: 8px;
+  height: calc(100% - 20px);
+  left: 0;
+  top: 10px;
+  cursor: w-resize;
+  border-radius: 0 4px 4px 0;
+}
+
+.react-grid-item > .react-resizable-handle.react-resizable-handle-n {
+  width: calc(100% - 20px);
+  height: 8px;
+  top: 0;
+  left: 10px;
+  cursor: n-resize;
+  border-radius: 0 0 4px 4px;
+}
+
+/* Corner handles */
+.react-grid-item > .react-resizable-handle.react-resizable-handle-nw {
+  width: 20px;
+  height: 20px;
+  top: 0;
+  left: 0;
+  cursor: nw-resize;
+  border-radius: 6px 0 0 6px;
+}
+
+.react-grid-item > .react-resizable-handle.react-resizable-handle-ne {
+  width: 20px;
+  height: 20px;
+  top: 0;
+  right: 0;
+  cursor: ne-resize;
+  border-radius: 0 6px 6px 0;
+}
+
+.react-grid-item > .react-resizable-handle.react-resizable-handle-sw {
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  left: 0;
+  cursor: sw-resize;
+  border-radius: 0 6px 6px 0;
+}
+
+/* Hover effects */
 .react-grid-item:hover > .react-resizable-handle {
-  background-color: rgba(59, 130, 246, 0.1);
-  border-radius: 2px;
+  background-color: rgba(59, 130, 246, 0.8);
+  transform: scale(1.1);
 }
 
 .react-grid-placeholder {

@@ -194,7 +194,22 @@ export default function BoxEditor({ boxId, isOpen, onClose }: BoxEditorProps) {
     handleChange('title', currentTitle + emoji);
   }, [currentBox.title, handleChange]);
 
-  if (!box || !isOpen) return null;
+  if (!isOpen) return null;
+
+  if (!box) {
+    console.error('BoxEditor: Box not found for ID:', boxId);
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Error</DialogTitle>
+          </DialogHeader>
+          <p>Box not found. Please try again.</p>
+          <Button onClick={onClose}>Close</Button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

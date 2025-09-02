@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ interface DynamicBoxProps {
   onEdit?: (id: string) => void;
   isSelected?: boolean;
   showEditButton?: boolean;
+  layout?: { w: number; h: number; x: number; y: number };
 }
 
 function computeShadow(intensity: number, direction: string) {
@@ -37,16 +38,21 @@ function DynamicBox({
   isEditMode = false, 
   onEdit, 
   isSelected = false, 
-  showEditButton = false 
+  showEditButton = false,
+  layout
 }: DynamicBoxProps) {
-  const { toggleBoxVisibility } = useBoxesStore();
+  const { toggleBoxVisibility, updateBox } = useBoxesStore();
   const modalEnabled = box?.modalEnabled !== false;
   const modalStyle = box?.modalStyle || {};
-  const heightPx = box?.height || 200;
+  
+  // Calculate dynamic height based on grid layout
+  const calculatedHeight = layout ? layout.h * 120 + (layout.h - 1) * 16 : (box?.height || 200);
+  const heightPx = showEditButton || isEditMode ? Math.max(calculatedHeight - 100, 150) : (box?.height || 200);
 
   const handleEditClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Edit button clicked for box:', box.id); // Debug log
     onEdit?.(box.id);
   }, [onEdit, box.id]);
 
@@ -55,6 +61,16 @@ function DynamicBox({
     e.stopPropagation();
     toggleBoxVisibility(box.id);
   }, [toggleBoxVisibility, box.id]);
+
+  // Sync layout changes back to box data
+  useEffect(() => {
+    if (layout && (showEditButton || isEditMode)) {
+      const newHeight = layout.h * 120 + (layout.h - 1) * 16;
+      if (newHeight !== box.height) {
+        updateBox(box.id, { height: Math.max(newHeight - 100, 150) });
+      }
+    }
+  }, [layout, showEditButton, isEditMode, box.height, box.id, updateBox]);
 
   const boxContent = (
     <div
@@ -70,6 +86,7 @@ function DynamicBox({
         boxShadow: box.shadow
           ? computeShadow(box.shadow.intensity, box.shadow.direction)
           : undefined,
+        minHeight: showEditButton || isEditMode ? `${calculatedHeight}px` : 'auto',
       }}
     >
       {/* Edit Controls Overlay - Always visible when showEditButton is true */}
@@ -241,17 +258,25 @@ export default function DynamicBoxes({
     setLayout,
   } = useBoxesStore();
 
-  // Get visible boxes for display
-  const visibleBoxes = useMemo(() => getVisibleBoxes(), [boxes]);
+  // Get all boxes for frontend, visible boxes for admin
+  const displayBoxes = useMemo(() => {
+    if (showEditButtons || isEditMode) {
+      // In admin mode, show all boxes (including hidden ones for management)
+      return boxes;
+    } else {
+      // In frontend mode, only show visible boxes
+      return getVisibleBoxes();
+    }
+  }, [boxes, getVisibleBoxes, showEditButtons, isEditMode]);
 
   // Prepare layouts for react-grid-layout
   const gridLayouts = useMemo(() => {
     const currentLayout = layouts[currentBreakpoint] || [];
     
-    // Ensure all visible boxes have layout entries
+    // Ensure all display boxes have layout entries
     const layoutMap = new Map(currentLayout.map(layout => [layout.i, layout]));
     
-    return visibleBoxes.map((box, index) => {
+    return displayBoxes.map((box, index) => {
       const existingLayout = layoutMap.get(box.id);
       if (existingLayout) {
         return existingLayout;
@@ -260,7 +285,7 @@ export default function DynamicBoxes({
       // Create default layout for new boxes
       const getSizeForBox = (size: string) => {
         switch (size) {
-          case 'large': return { w: 4, h: 2 };
+          case 'large': return { w: 4, h: 3 };
           case 'medium': return { w: 2, h: 2 };
           default: return { w: 1, h: 2 };
         }
@@ -275,9 +300,11 @@ export default function DynamicBoxes({
         h,
         minW: 1,
         minH: 1,
+        maxW: 4,
+        maxH: 6,
       };
     });
-  }, [visibleBoxes, layouts, currentBreakpoint]);
+  }, [displayBoxes, layouts, currentBreakpoint]);
 
   const handleLayoutChange = useCallback((layout: Layout[]) => {
     if (!isEditMode && !showEditButtons) return;
@@ -297,10 +324,15 @@ export default function DynamicBoxes({
     setLayout(currentBreakpoint, boxLayouts);
   }, [isEditMode, showEditButtons, currentBreakpoint, setLayout]);
 
+  const handleResizeStop = useCallback((layout: Layout[]) => {
+    console.log('Resize stopped, new layout:', layout); // Debug log
+    handleLayoutChange(layout);
+  }, [handleLayoutChange]);
+
   const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
   const cols = { lg: 4, md: 3, sm: 2, xs: 1, xxs: 1 };
 
-  if (visibleBoxes.length === 0) {
+  if (displayBoxes.length === 0) {
     return (
       <section className="mx-auto max-w-[1200px] px-4 sm:px-6 mt-8 sm:mt-10">
         <div className="text-center py-12">
@@ -319,6 +351,7 @@ export default function DynamicBoxes({
         cols={cols}
         rowHeight={120}
         onLayoutChange={handleLayoutChange}
+        onResizeStop={handleResizeStop}
         isDraggable={isEditMode || showEditButtons}
         isResizable={isEditMode || showEditButtons}
         compactType={(isEditMode || showEditButtons) ? null : 'vertical'}
@@ -326,34 +359,39 @@ export default function DynamicBoxes({
         margin={[16, 16]}
         containerPadding={[0, 0]}
         useCSSTransforms={true}
-        draggableHandle={isEditMode ? undefined : '.drag-handle'}
+        draggableHandle={isEditMode && !showEditButtons ? '.drag-handle' : undefined}
+        resizeHandles={['se', 'e', 's', 'w', 'n', 'sw', 'ne', 'nw']}
       >
-        {visibleBoxes.map((box) => (
-          <div key={box.id} className="relative">
-            <DynamicBox
-              box={box}
-              isEditMode={isEditMode}
-              onEdit={onBoxEdit}
-              isSelected={selectedBox === box.id}
-              showEditButton={showEditButtons}
-            />
-            {isEditMode && !showEditButtons && (
-              <div className="drag-handle absolute top-2 right-2 w-6 h-6 bg-white/80 rounded cursor-move flex items-center justify-center opacity-60 hover:opacity-100 transition-opacity">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                  <circle cx="2" cy="2" r="1"/>
-                  <circle cx="6" cy="2" r="1"/>
-                  <circle cx="10" cy="2" r="1"/>
-                  <circle cx="2" cy="6" r="1"/>
-                  <circle cx="6" cy="6" r="1"/>
-                  <circle cx="10" cy="6" r="1"/>
-                  <circle cx="2" cy="10" r="1"/>
-                  <circle cx="6" cy="10" r="1"/>
-                  <circle cx="10" cy="10" r="1"/>
-                </svg>
-              </div>
-            )}
-          </div>
-        ))}
+        {displayBoxes.map((box) => {
+          const boxLayout = gridLayouts.find(l => l.i === box.id);
+          return (
+            <div key={box.id} className="relative">
+              <DynamicBox
+                box={box}
+                isEditMode={isEditMode}
+                onEdit={onBoxEdit}
+                isSelected={selectedBox === box.id}
+                showEditButton={showEditButtons}
+                layout={boxLayout}
+              />
+              {isEditMode && !showEditButtons && (
+                <div className="drag-handle absolute top-2 right-2 w-6 h-6 bg-white/80 rounded cursor-move flex items-center justify-center opacity-60 hover:opacity-100 transition-opacity z-30">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                    <circle cx="2" cy="2" r="1"/>
+                    <circle cx="6" cy="2" r="1"/>
+                    <circle cx="10" cy="2" r="1"/>
+                    <circle cx="2" cy="6" r="1"/>
+                    <circle cx="6" cy="6" r="1"/>
+                    <circle cx="10" cy="6" r="1"/>
+                    <circle cx="2" cy="10" r="1"/>
+                    <circle cx="6" cy="10" r="1"/>
+                    <circle cx="10" cy="10" r="1"/>
+                  </svg>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </ResponsiveGridLayout>
     </section>
   );

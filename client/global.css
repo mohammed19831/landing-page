@@ -5,6 +5,93 @@
 @tailwind components;
 @tailwind utilities;
 
+/* React Grid Layout Styles */
+.react-grid-layout {
+  position: relative;
+}
+
+.react-grid-item {
+  transition: all 200ms ease;
+  transition-property: left, top;
+}
+
+.react-grid-item img {
+  pointer-events: none;
+  user-select: none;
+}
+
+.react-grid-item.cssTransforms {
+  transition-property: transform;
+}
+
+.react-grid-item > .react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxnIGZpbGw9IiM0NDQiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbC1vcGFjaXR5PSIuMyI+PHBhdGggZD0iTTYgNkgwVjRoNHYyeiIvPjxwYXRoIGQ9Ik02IDZWMEg0djRoMnoiLz48L2c+PC9zdmc+');
+  background-position: bottom right;
+  padding: 0 3px 3px 0;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  cursor: se-resize;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-right: 2px solid rgba(0, 0, 0, 0.4);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+}
+
+.react-grid-item:hover > .react-resizable-handle {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 2px;
+}
+
+.react-grid-placeholder {
+  background: rgba(59, 130, 246, 0.2);
+  opacity: 0.8;
+  transition-duration: 100ms;
+  z-index: 2;
+  user-select: none;
+  border: 2px dashed #3b82f6;
+  border-radius: 8px;
+}
+
+/* Drag handle styling */
+.drag-handle {
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.drag-handle:hover {
+  background-color: rgba(59, 130, 246, 0.8) !important;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 @layer base {
   /**
    * Tailwind CSS theme

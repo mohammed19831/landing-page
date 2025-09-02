@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import HeroSlider from "@/components/home/HeroSlider";
-import Boxes from "@/components/home/Boxes";
+import DynamicBoxes from "@/components/home/DynamicBoxes";
 import LogosMarquee from "@/components/home/LogosMarquee";
 import ContactSection from "@/components/home/ContactSection";
 
@@ -12,7 +12,7 @@ export default function Index() {
   return (
     <div>
       <HeroSlider />
-      <Boxes />
+      <DynamicBoxes />
       <LogosMarquee />
       <ContactSection />
     </div>

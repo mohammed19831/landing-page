@@ -1,6 +1,8 @@
 import React, { useMemo, useCallback } from 'react';
 import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Settings, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { bgStyleFrom } from '@/lib/background';
 import { useBoxesStore, BoxData, BoxLayout } from '@/state/boxes-store';
@@ -11,8 +13,9 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 interface DynamicBoxProps {
   box: BoxData;
   isEditMode?: boolean;
-  onSelect?: (id: string) => void;
+  onEdit?: (id: string) => void;
   isSelected?: boolean;
+  showEditButton?: boolean;
 }
 
 function computeShadow(intensity: number, direction: string) {
@@ -29,24 +32,35 @@ function computeShadow(intensity: number, direction: string) {
   return `${x}px ${y}px ${blur}px ${spread}px rgba(0,0,0,0.15)`;
 }
 
-function DynamicBox({ box, isEditMode = false, onSelect, isSelected = false }: DynamicBoxProps) {
+function DynamicBox({ 
+  box, 
+  isEditMode = false, 
+  onEdit, 
+  isSelected = false, 
+  showEditButton = false 
+}: DynamicBoxProps) {
+  const { toggleBoxVisibility } = useBoxesStore();
   const modalEnabled = box?.modalEnabled !== false;
   const modalStyle = box?.modalStyle || {};
   const heightPx = box?.height || 200;
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    if (isEditMode) {
-      e.preventDefault();
-      e.stopPropagation();
-      onSelect?.(box.id);
-    }
-  }, [isEditMode, onSelect, box.id]);
+  const handleEditClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onEdit?.(box.id);
+  }, [onEdit, box.id]);
+
+  const handleVisibilityToggle = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleBoxVisibility(box.id);
+  }, [toggleBoxVisibility, box.id]);
 
   const boxContent = (
     <div
       className={cn(
         'group relative w-full h-full border bg-white transition focus:outline-none focus:ring-2 focus:ring-brand-600 disabled:cursor-not-allowed overflow-hidden',
-        isEditMode && 'cursor-pointer hover:ring-2 hover:ring-blue-400',
+        isEditMode && 'hover:ring-2 hover:ring-blue-400',
         isSelected && 'ring-2 ring-blue-500'
       )}
       style={{
@@ -56,13 +70,40 @@ function DynamicBox({ box, isEditMode = false, onSelect, isSelected = false }: D
           ? computeShadow(box.shadow.intensity, box.shadow.direction)
           : undefined,
       }}
-      onClick={handleClick}
     >
-      {/* Edit mode overlay */}
-      {isEditMode && (
+      {/* Edit Controls Overlay - Always visible when showEditButton is true */}
+      {showEditButton && (
+        <div className="absolute top-2 right-2 z-20 flex gap-1">
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-8 w-8 p-0 bg-white/90 hover:bg-white border shadow-sm"
+            onClick={handleEditClick}
+            title="Edit Box"
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-8 w-8 p-0 bg-white/90 hover:bg-white border shadow-sm"
+            onClick={handleVisibilityToggle}
+            title={box.hidden ? "Show Box" : "Hide Box"}
+          >
+            {box.hidden ? (
+              <Eye className="h-4 w-4" />
+            ) : (
+              <EyeOff className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/* Edit mode overlay for drag indication */}
+      {isEditMode && !showEditButton && (
         <div className="absolute inset-0 bg-blue-500/10 z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="bg-white/90 px-2 py-1 rounded text-xs font-medium">
-            Click to edit
+            Drag to reposition
           </div>
         </div>
       )}
@@ -119,8 +160,8 @@ function DynamicBox({ box, isEditMode = false, onSelect, isSelected = false }: D
     </div>
   );
 
-  // In edit mode, don't wrap with Dialog
-  if (isEditMode) {
+  // In edit mode or when showEditButton is true, don't wrap with Dialog
+  if (isEditMode || showEditButton) {
     return boxContent;
   }
 
@@ -180,14 +221,16 @@ function DynamicBox({ box, isEditMode = false, onSelect, isSelected = false }: D
 
 interface DynamicBoxesProps {
   isEditMode?: boolean;
-  onBoxSelect?: (id: string) => void;
+  onBoxEdit?: (id: string) => void;
   selectedBox?: string | null;
+  showEditButtons?: boolean;
 }
 
 export default function DynamicBoxes({ 
   isEditMode = false, 
-  onBoxSelect, 
-  selectedBox 
+  onBoxEdit, 
+  selectedBox,
+  showEditButtons = false
 }: DynamicBoxesProps) {
   const {
     boxes,
@@ -236,7 +279,7 @@ export default function DynamicBoxes({
   }, [visibleBoxes, layouts, currentBreakpoint]);
 
   const handleLayoutChange = useCallback((layout: Layout[]) => {
-    if (!isEditMode) return;
+    if (!isEditMode && !showEditButtons) return;
     
     const boxLayouts: BoxLayout[] = layout.map(item => ({
       i: item.i,
@@ -251,7 +294,7 @@ export default function DynamicBoxes({
     }));
     
     setLayout(currentBreakpoint, boxLayouts);
-  }, [isEditMode, currentBreakpoint, setLayout]);
+  }, [isEditMode, showEditButtons, currentBreakpoint, setLayout]);
 
   const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
   const cols = { lg: 4, md: 3, sm: 2, xs: 1, xxs: 1 };
@@ -275,9 +318,9 @@ export default function DynamicBoxes({
         cols={cols}
         rowHeight={120}
         onLayoutChange={handleLayoutChange}
-        isDraggable={isEditMode}
-        isResizable={isEditMode}
-        compactType={isEditMode ? null : 'vertical'}
+        isDraggable={isEditMode || showEditButtons}
+        isResizable={isEditMode || showEditButtons}
+        compactType={(isEditMode || showEditButtons) ? null : 'vertical'}
         preventCollision={false}
         margin={[16, 16]}
         containerPadding={[0, 0]}
@@ -289,10 +332,11 @@ export default function DynamicBoxes({
             <DynamicBox
               box={box}
               isEditMode={isEditMode}
-              onSelect={onBoxSelect}
+              onEdit={onBoxEdit}
               isSelected={selectedBox === box.id}
+              showEditButton={showEditButtons}
             />
-            {isEditMode && (
+            {isEditMode && !showEditButtons && (
               <div className="drag-handle absolute top-2 right-2 w-6 h-6 bg-white/80 rounded cursor-move flex items-center justify-center opacity-60 hover:opacity-100 transition-opacity">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
                   <circle cx="2" cy="2" r="1"/>

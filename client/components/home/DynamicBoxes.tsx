@@ -289,7 +289,7 @@ export default function DynamicBoxes({
     } catch (e) {
       // ignore
     }
-  }, [setLayout]);
+  }, []);
 
   // Sort boxes by their layout position so DOM order matches visual order
   const sortedDisplayBoxes = useMemo(() => {

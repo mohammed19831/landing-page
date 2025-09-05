@@ -70,6 +70,11 @@ export default function DynamicBoxesAdmin() {
     setEditMode(enabled);
   }, [setEditMode]);
 
+  // stable wrapper passed to Switch to avoid passing store setter directly
+  const handleEditModeSwitch = useCallback((checked: boolean) => {
+    handleEditModeToggle(checked);
+  }, [handleEditModeToggle]);
+
   useEffect(() => {
     if (!isEditMode) setSelectedBox(null);
   }, [isEditMode, setSelectedBox]);

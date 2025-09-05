@@ -213,7 +213,7 @@ export default function BoxEditor({ boxId, isOpen, onClose }: BoxEditorProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto z-[9999]" style={{ zIndex: 9999 }}>
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Edit Box: {currentBox.title}</span>

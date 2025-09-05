@@ -95,7 +95,7 @@ function DynamicBox({
           <Button
             size="sm"
             variant="secondary"
-            className="h-8 w-8 p-0 bg-white/90 hover:bg-white border shadow-sm"
+            className="edit-btn h-8 w-8 p-0 bg-white/90 hover:bg-white border shadow-sm"
             onClick={handleEditClick}
             title="Edit Box"
           >

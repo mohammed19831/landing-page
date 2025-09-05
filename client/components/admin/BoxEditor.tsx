@@ -39,7 +39,7 @@ function ColorPickerComponent({ color, onChange, label }: ColorPickerProps) {
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-full justify-start gap-2"
+            className="w-full justify-start gap-2 color-picker-trigger"
             onClick={() => setShowPicker(true)}
           >
             <div

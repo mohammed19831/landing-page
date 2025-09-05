@@ -49,7 +49,7 @@ function ColorPickerComponent({ color, onChange, label }: ColorPickerProps) {
             {color}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
+        <PopoverContent className="w-auto p-0 color-picker">
           <ChromePicker
             color={color}
             onChange={(result) => onChange(result.hex)}
@@ -141,7 +141,7 @@ function EmojiPickerComponent({ onEmojiSelect }: EmojiPickerComponentProps) {
           Add Emoji
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent className="w-auto p-0 emoji-picker">
         <EmojiPicker
           onEmojiClick={(emojiData) => {
             onEmojiSelect(emojiData.emoji);
@@ -213,7 +213,7 @@ export default function BoxEditor({ boxId, isOpen, onClose }: BoxEditorProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto z-[9999]" style={{ zIndex: 9999 }}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Edit Box: {currentBox.title}</span>

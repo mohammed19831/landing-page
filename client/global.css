@@ -26,6 +26,11 @@
 
 /* Resize Handles - visible by default (frontend + admin) */
 .react-grid-item > .react-resizable-handle {
+  display: none; /* hidden by default (frontend) */
+}
+
+/* Enhanced Resize Handles (visible only in admin-edit-mode) */
+.admin-edit-mode .react-grid-item > .react-resizable-handle {
   position: absolute;
   background-color: rgba(59, 130, 246, 0.6);
   border: 2px solid #3b82f6;
@@ -34,7 +39,7 @@
 }
 
 /* Bottom-right corner handle */
-.react-grid-item > .react-resizable-handle.react-resizable-handle-se {
+.admin-edit-mode .react-grid-item > .react-resizable-handle.react-resizable-handle-se {
   width: 20px;
   height: 20px;
   bottom: 0;
@@ -44,7 +49,7 @@
 }
 
 /* Edge handles */
-.react-grid-item > .react-resizable-handle.react-resizable-handle-e {
+.admin-edit-mode .react-grid-item > .react-resizable-handle.react-resizable-handle-e {
   width: 8px;
   height: calc(100% - 20px);
   right: 0;
@@ -53,7 +58,7 @@
   border-radius: 4px 0 0 4px;
 }
 
-.react-grid-item > .react-resizable-handle.react-resizable-handle-s {
+.admin-edit-mode .react-grid-item > .react-resizable-handle.react-resizable-handle-s {
   width: calc(100% - 20px);
   height: 8px;
   bottom: 0;
@@ -62,7 +67,7 @@
   border-radius: 4px 4px 0 0;
 }
 
-.react-grid-item > .react-resizable-handle.react-resizable-handle-w {
+.admin-edit-mode .react-grid-item > .react-resizable-handle.react-resizable-handle-w {
   width: 8px;
   height: calc(100% - 20px);
   left: 0;
@@ -71,7 +76,7 @@
   border-radius: 0 4px 4px 0;
 }
 
-.react-grid-item > .react-resizable-handle.react-resizable-handle-n {
+.admin-edit-mode .react-grid-item > .react-resizable-handle.react-resizable-handle-n {
   width: calc(100% - 20px);
   height: 8px;
   top: 0;
@@ -81,7 +86,7 @@
 }
 
 /* Corner handles */
-.react-grid-item > .react-resizable-handle.react-resizable-handle-nw {
+.admin-edit-mode .react-grid-item > .react-resizable-handle.react-resizable-handle-nw {
   width: 20px;
   height: 20px;
   top: 0;
@@ -90,7 +95,7 @@
   border-radius: 6px 0 0 6px;
 }
 
-.react-grid-item > .react-resizable-handle.react-resizable-handle-ne {
+.admin-edit-mode .react-grid-item > .react-resizable-handle.react-resizable-handle-ne {
   width: 20px;
   height: 20px;
   top: 0;
@@ -99,7 +104,7 @@
   border-radius: 0 6px 6px 0;
 }
 
-.react-grid-item > .react-resizable-handle.react-resizable-handle-sw {
+.admin-edit-mode .react-grid-item > .react-resizable-handle.react-resizable-handle-sw {
   width: 20px;
   height: 20px;
   bottom: 0;
@@ -109,7 +114,7 @@
 }
 
 /* Hover effects */
-.react-grid-item:hover > .react-resizable-handle {
+.admin-edit-mode .react-grid-item:hover > .react-resizable-handle {
   background-color: rgba(59, 130, 246, 0.8);
   transform: scale(1.1);
 }

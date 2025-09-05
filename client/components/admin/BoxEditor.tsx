@@ -544,7 +544,7 @@ export default function BoxEditor({ boxId, isOpen, onClose }: BoxEditorProps) {
                   <Switch
                     id="modalEnabled"
                     checked={currentBox.modalEnabled !== false}
-                    onCheckedChange={(checked) => handleChange('modalEnabled', checked)}
+                    onCheckedChange={handleModalEnabledChange}
                   />
                   <Label htmlFor="modalEnabled">Enable Modal Dialog</Label>
                 </div>

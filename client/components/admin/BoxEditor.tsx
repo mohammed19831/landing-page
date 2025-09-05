@@ -136,7 +136,7 @@ function EmojiPickerComponent({ onEmojiSelect }: EmojiPickerComponentProps) {
   return (
     <Popover open={showPicker} onOpenChange={setShowPicker}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="emoji-picker-trigger">
           <Smile className="w-4 h-4 mr-2" />
           Add Emoji
         </Button>

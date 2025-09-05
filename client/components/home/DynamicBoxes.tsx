@@ -283,25 +283,33 @@ export default function DynamicBoxes({
       }
       
       // Create default layout for new boxes
+      // Map logical sizes to a 12-column grid widths (allows 1-4 items per row)
       const getSizeForBox = (size: string) => {
         switch (size) {
-          case 'large': return { w: 4, h: 3 };
-          case 'medium': return { w: 2, h: 2 };
-          default: return { w: 1, h: 2 };
+          case 'large': return { w: 6, h: 2 }; // ~2 per row
+          case 'medium': return { w: 4, h: 2 }; // ~3 per row
+          default: return { w: 3, h: 2 }; // ~4 per row
         }
       };
-      
+
       const { w, h } = getSizeForBox(box.size);
+
+      // Simple flow layout on a 12-column grid
+      const colsTotal = 12;
+      const placementUnit = 3; // default small width to help initial placements
+      const x = (index * placementUnit) % colsTotal;
+      const y = Math.floor((index * placementUnit) / colsTotal) * 2;
+
       return {
         i: box.id,
-        x: (index * 1) % 4,
-        y: Math.floor(index / 4) * 2,
+        x,
+        y,
         w,
         h,
-        minW: 1,
-        minH: 1,
-        maxW: 4,
-        maxH: 6,
+        minW: 3,
+        minH: 2,
+        maxW: 12,
+        maxH: 12,
       };
     });
   }, [displayBoxes, layouts, currentBreakpoint]);
@@ -330,7 +338,8 @@ export default function DynamicBoxes({
   }, [handleLayoutChange]);
 
   const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
-  const cols = { lg: 4, md: 3, sm: 2, xs: 1, xxs: 1 };
+  // Use 12-column baseline to allow flexible 1-4 per row mappings
+  const cols = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
 
   if (displayBoxes.length === 0) {
     return (
@@ -349,21 +358,30 @@ export default function DynamicBoxes({
         layouts={{ [currentBreakpoint]: gridLayouts }}
         breakpoints={breakpoints}
         cols={cols}
-        rowHeight={120}
-        onLayoutChange={handleLayoutChange}
-        onResizeStop={handleResizeStop}
+        rowHeight={80}
+        onLayoutChange={(layout) => handleLayoutChange(layout)}
+        onDragStop={(layout) => handleLayoutChange(layout)}
+        onResizeStop={(layout) => handleResizeStop(layout)}
         isDraggable={isEditMode || showEditButtons}
         isResizable={isEditMode || showEditButtons}
         compactType={(isEditMode || showEditButtons) ? null : 'vertical'}
         preventCollision={false}
         margin={[16, 16]}
-        containerPadding={[0, 0]}
+        containerPadding={[16, 16]}
         useCSSTransforms={true}
-        draggableHandle={isEditMode && !showEditButtons ? '.drag-handle' : undefined}
+        draggableHandle={isEditMode && !showEditButtons ? '.drag-handle' : '.drag-handle'}
+        draggableCancel={isEditMode ? '.edit-btn, .editor, input, textarea, select, .color-picker, .popover' : ''}
         resizeHandles={['se', 'e', 's', 'w', 'n', 'sw', 'ne', 'nw']}
       >
         {displayBoxes.map((box) => {
-          const boxLayout = gridLayouts.find(l => l.i === box.id);
+          const boxLayout = gridLayouts.find(l => l.i === box.id) || { i: box.id, x: 0, y: 0, w: 3, h: 2 };
+
+          // If the admin opened the editor for this box, mark it static so it can't be dragged/resized
+          const editingBoxId = (typeof (window as any).__CURRENT_EDITING_BOX_ID__ !== 'undefined') ? (window as any).__CURRENT_EDITING_BOX_ID__ : null;
+          if (editingBoxId === box.id) {
+            boxLayout.static = true;
+          }
+
           return (
             <div key={box.id} className="relative">
               <DynamicBox

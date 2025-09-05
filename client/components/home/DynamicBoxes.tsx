@@ -309,7 +309,10 @@ export default function DynamicBoxes({
 
     return sortedDisplayBoxes.map((box, index) => {
       const existingLayout = layoutMap.get(box.id);
-      if (existingLayout) return existingLayout;
+      if (existingLayout) {
+        // ensure static flag reflects current mode
+        return { ...existingLayout, static: !(isEditMode || showEditButtons) };
+      }
 
       const getSizeForBox = (size: string) => {
         switch (size) {
@@ -335,9 +338,10 @@ export default function DynamicBoxes({
         minH: 2,
         maxW: 12,
         maxH: 12,
+        static: !(isEditMode || showEditButtons),
       };
     });
-  }, [sortedDisplayBoxes, layouts, currentBreakpoint]);
+  }, [sortedDisplayBoxes, layouts, currentBreakpoint, isEditMode, showEditButtons]);
 
   // Save layouts to localStorage whenever layout changes
   const saveLayoutsToLocal = useCallback((newLayouts: { [key: string]: BoxLayout[] }) => {

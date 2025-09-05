@@ -74,8 +74,12 @@ export default function DynamicBoxesAdmin() {
   }, [setEditMode, setSelectedBox]);
 
   const handleBoxEdit = useCallback((boxId: string) => {
+    // Expose the currently editing box id globally so the grid can mark it static
+    (window as any).__CURRENT_EDITING_BOX_ID__ = boxId;
     setEditingBoxId(boxId);
-  }, []);
+    // also select it in the global store for visual state
+    setSelectedBox(boxId);
+  }, [setSelectedBox]);
 
   const handleBreakpointChange = useCallback((breakpoint: string) => {
     setCurrentBreakpoint(breakpoint);
@@ -218,7 +222,10 @@ export default function DynamicBoxesAdmin() {
           isOpen={!!editingBoxId}
           onClose={() => {
             console.log('Closing BoxEditor'); // Debug log
+            // Clear global editing marker to re-enable dragging/resizing
+            (window as any).__CURRENT_EDITING_BOX_ID__ = null;
             setEditingBoxId(null);
+            setSelectedBox(null);
           }}
         />
       )}

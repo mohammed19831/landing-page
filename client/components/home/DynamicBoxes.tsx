@@ -369,7 +369,7 @@ export default function DynamicBoxes({
         margin={[16, 16]}
         containerPadding={[16, 16]}
         useCSSTransforms={true}
-        draggableHandle={isEditMode && !showEditButtons ? '.drag-handle' : '.drag-handle'}
+        draggableHandle={isEditMode && !showEditButtons ? '.drag-handle' : undefined}
         draggableCancel={isEditMode ? '.edit-btn, .editor, input, textarea, select, .color-picker, .color-picker-trigger, .emoji-picker, .emoji-picker-trigger, .popover, .select-content' : ''}
         resizeHandles={['se', 'e', 's', 'w', 'n', 'sw', 'ne', 'nw']}
       >

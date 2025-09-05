@@ -181,6 +181,10 @@ export default function BoxEditor({ boxId, isOpen, onClose }: BoxEditorProps) {
     }));
   }, [currentBox]);
 
+  // Stable handlers for switches (avoid recreating inline lambdas)
+  const handleModalEnabledChange = useCallback((checked: boolean) => handleChange('modalEnabled', checked), [handleChange]);
+  const handleHiddenChange = useCallback((checked: boolean) => handleChange('hidden', checked), [handleChange]);
+
   const handleSave = useCallback(() => {
     if (Object.keys(localChanges).length > 0) {
       updateBox(boxId, localChanges);

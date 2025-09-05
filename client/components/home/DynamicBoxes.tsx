@@ -370,7 +370,7 @@ export default function DynamicBoxes({
         containerPadding={[16, 16]}
         useCSSTransforms={true}
         draggableHandle={isEditMode && !showEditButtons ? '.drag-handle' : '.drag-handle'}
-        draggableCancel={isEditMode ? '.edit-btn, .editor, input, textarea, select, .color-picker, .popover' : ''}
+        draggableCancel={isEditMode ? '.edit-btn, .editor, input, textarea, select, .color-picker, .emoji-picker, .popover, .select-content' : ''}
         resizeHandles={['se', 'e', 's', 'w', 'n', 'sw', 'ne', 'nw']}
       >
         {displayBoxes.map((box) => {

@@ -67,9 +67,14 @@ function DynamicBox({
     if (layout && (showEditButton || isEditMode)) {
       const newHeight = layout.h * 120 + (layout.h - 1) * 16;
       if (newHeight !== box.height) {
-        updateBox(box.id, { height: Math.max(newHeight - 100, 150) });
+        // Defer update to avoid state updates during render cycle
+        const t = setTimeout(() => {
+          updateBox(box.id, { height: Math.max(newHeight - 100, 150) });
+        }, 0);
+        return () => clearTimeout(t);
       }
     }
+    return;
   }, [layout, showEditButton, isEditMode, box.height, box.id, updateBox]);
 
   const boxContent = (

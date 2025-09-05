@@ -124,7 +124,7 @@ export default function DynamicBoxesAdmin() {
                 <Switch
                   id="edit-mode"
                   checked={isEditMode}
-                  onCheckedChange={handleEditModeToggle}
+                  onCheckedChange={setEditMode}
                 />
                 <Label htmlFor="edit-mode" className="font-medium">
                   Edit Mode

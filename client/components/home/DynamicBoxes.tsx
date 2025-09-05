@@ -392,42 +392,7 @@ export default function DynamicBoxes({
     );
   }
 
-  const isFrontend = !isEditMode && !showEditButtons;
-
-  if (isFrontend) {
-    // Frontend: use CSS grid auto-placement to avoid left-only packing and to auto-fill
-    return (
-      <section className={cn('mx-auto max-w-[1200px] px-4 sm:px-6 mt-8 sm:mt-10')}>
-        <div className="frontend-grid">
-          {displayBoxes.map((box) => {
-            const boxLayout = gridLayouts.find(l => l.i === box.id) || { i: box.id, w: 3, h: 2 };
-            const colSpan = Math.max(1, Math.min(12, boxLayout.w || 3));
-            return (
-              <div
-                key={box.id}
-                className="frontend-grid-item"
-                style={{
-                  // use CSS variable for responsive spans
-                  ['--col-span' as any]: colSpan,
-                }}
-              >
-                <DynamicBox
-                  box={box}
-                  isEditMode={false}
-                  onEdit={undefined}
-                  isSelected={false}
-                  showEditButton={false}
-                  layout={boxLayout}
-                />
-              </div>
-            );
-          })}
-        </div>
-      </section>
-    );
-  }
-
-  // Admin/edit mode: use react-grid-layout with editing affordances
+  // Always render the responsive grid layout so frontend mirrors backend positions
   return (
     <section className={cn('mx-auto max-w-[1200px] px-4 sm:px-6 mt-8 sm:mt-10', (isEditMode || showEditButtons) && 'admin-edit-mode')}>
       <ResponsiveGridLayout
@@ -450,7 +415,7 @@ export default function DynamicBoxes({
         draggableCancel={isEditMode ? '.edit-btn, .editor, input, textarea, select, .color-picker, .color-picker-trigger, .emoji-picker, .emoji-picker-trigger, .popover, .select-content' : undefined}
         resizeHandles={['se', 'e', 's', 'w', 'n', 'sw', 'ne', 'nw']}
       >
-        {displayBoxes.map((box) => {
+        {sortedDisplayBoxes.map((box) => {
           const boxLayout = gridLayouts.find(l => l.i === box.id) || { i: box.id, x: 0, y: 0, w: 3, h: 2 };
 
           // If the admin opened the editor for this box, mark it static so it can't be dragged/resized

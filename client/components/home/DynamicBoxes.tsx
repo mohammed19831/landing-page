@@ -427,8 +427,8 @@ export default function DynamicBoxes({
         onLayoutChange={(layout, allLayouts) => handleLayoutChange(layout, allLayouts as any)}
         onDragStop={(layout) => handleLayoutChange(layout, { ...layoutsProp, [currentBreakpoint]: layout } as any)}
         onResizeStop={(layout) => handleLayoutChange(layout, { ...layoutsProp, [currentBreakpoint]: layout } as any)}
-        isDraggable={true}
-        isResizable={true}
+        isDraggable={isEditMode || showEditButtons}
+        isResizable={isEditMode || showEditButtons}
         compactType={(isEditMode || showEditButtons) ? null : 'vertical'}
         preventCollision={false}
         margin={[16, 16]}
@@ -436,7 +436,7 @@ export default function DynamicBoxes({
         useCSSTransforms={true}
         draggableHandle={isEditMode && !showEditButtons ? '.drag-handle' : undefined}
         draggableCancel={isEditMode ? '.edit-btn, .editor, input, textarea, select, .color-picker, .color-picker-trigger, .emoji-picker, .emoji-picker-trigger, .popover, .select-content' : undefined}
-        resizeHandles={['se', 'e', 's', 'w', 'n', 'sw', 'ne', 'nw']}
+        resizeHandles={isEditMode || showEditButtons ? ['se', 'e', 's', 'w', 'n', 'sw', 'ne', 'nw'] : []}
       >
         {sortedDisplayBoxes.map((box) => {
           const boxLayout = gridLayouts.find(l => l.i === box.id) || { i: box.id, x: 0, y: 0, w: 3, h: 2 };

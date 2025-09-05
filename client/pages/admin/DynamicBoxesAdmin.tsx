@@ -68,10 +68,11 @@ export default function DynamicBoxesAdmin() {
 
   const handleEditModeToggle = useCallback((enabled: boolean) => {
     setEditMode(enabled);
-    if (!enabled) {
-      setSelectedBox(null);
-    }
-  }, [setEditMode, setSelectedBox]);
+  }, [setEditMode]);
+
+  useEffect(() => {
+    if (!isEditMode) setSelectedBox(null);
+  }, [isEditMode, setSelectedBox]);
 
   const handleBoxEdit = useCallback((boxId: string) => {
     // Expose the currently editing box id globally so the grid can mark it static

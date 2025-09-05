@@ -553,7 +553,7 @@ export default function BoxEditor({ boxId, isOpen, onClose }: BoxEditorProps) {
                   <Switch
                     id="hidden"
                     checked={currentBox.hidden || false}
-                    onCheckedChange={(checked) => handleChange('hidden', checked)}
+                    onCheckedChange={handleHiddenChange}
                   />
                   <Label htmlFor="hidden">Hide Box</Label>
                 </div>

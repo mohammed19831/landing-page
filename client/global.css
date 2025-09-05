@@ -179,6 +179,43 @@
   overflow: hidden;
 }
 
+/* Frontend CSS Grid for live site (auto-flow, responsive columns) */
+.frontend-grid {
+  display: grid;
+  gap: 16px;
+  grid-auto-rows: minmax(100px, auto);
+}
+
+/* Desktop >=1200px */
+@media (min-width: 1200px) {
+  .frontend-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+}
+
+/* Tablet >=996px */
+@media (min-width: 996px) and (max-width: 1199px) {
+  .frontend-grid { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+}
+
+/* Small >=768px */
+@media (min-width: 768px) and (max-width: 995px) {
+  .frontend-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+/* Mobile >=480px */
+@media (min-width: 480px) and (max-width: 767px) {
+  .frontend-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Tiny <480px */
+@media (max-width: 479px) {
+  .frontend-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.frontend-grid-item {
+  display: block;
+  grid-column: span var(--col-span, 3);
+}
+
 @layer base {
   /**
    * Tailwind CSS theme

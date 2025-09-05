@@ -126,8 +126,13 @@
 
 /* Drag handle styling */
 .drag-handle {
+  display: none;
   z-index: 10;
   transition: all 0.2s ease;
+}
+
+.admin-edit-mode .drag-handle {
+  display: inline-flex;
 }
 
 .drag-handle:hover {

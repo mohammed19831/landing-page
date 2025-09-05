@@ -86,15 +86,15 @@ const createDefaultBox = (): BoxData => ({
   hidden: false,
 });
 
-// Convert size to grid dimensions
+// Convert size to grid dimensions on a 12-column baseline
 const getGridDimensions = (size: string) => {
   switch (size) {
     case 'large':
-      return { w: 4, h: 2 };
+      return { w: 6, h: 2 }; // ~2 per row
     case 'medium':
-      return { w: 2, h: 2 };
+      return { w: 4, h: 2 }; // ~3 per row
     default:
-      return { w: 1, h: 2 };
+      return { w: 3, h: 2 }; // ~4 per row
   }
 };
 
@@ -131,8 +131,9 @@ export const useBoxesStore = create<BoxesStore>()(
           y,
           w,
           h,
-          minW: 1,
-          minH: 1,
+          minW: 3,
+          minH: 2,
+          maxW: 12,
         };
 
         set(state => ({
@@ -213,8 +214,9 @@ export const useBoxesStore = create<BoxesStore>()(
           y: (originalLayout?.y || 0) + (originalLayout?.h || 2),
           w,
           h,
-          minW: 1,
-          minH: 1,
+          minW: 3,
+          minH: 2,
+          maxW: 12,
         };
 
         set(state => ({

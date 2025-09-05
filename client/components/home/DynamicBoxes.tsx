@@ -261,13 +261,46 @@ export default function DynamicBoxes({
   // Get all boxes for frontend, visible boxes for admin
   const displayBoxes = useMemo(() => {
     if (showEditButtons || isEditMode) {
-      // In admin mode, show all boxes (including hidden ones for management)
       return boxes;
     } else {
-      // In frontend mode, only show visible boxes
       return getVisibleBoxes();
     }
   }, [boxes, getVisibleBoxes, showEditButtons, isEditMode]);
+
+  // Load saved layouts from localStorage on mount to hydrate store layouts
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('gridLayout');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          Object.entries(parsed).forEach(([bp, layoutArr]) => {
+            if (Array.isArray(layoutArr)) {
+              setLayout(bp, layoutArr as BoxLayout[]);
+            }
+          });
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [setLayout]);
+
+  // Sort boxes by their layout position so DOM order matches visual order
+  const sortedDisplayBoxes = useMemo(() => {
+    const currentLayout = layouts[currentBreakpoint] || [];
+    const layoutMap = new Map(currentLayout.map(l => [l.i, l]));
+    // Attach positions
+    return [...displayBoxes].sort((a, b) => {
+      const la = layoutMap.get(a.id);
+      const lb = layoutMap.get(b.id);
+      if (!la && !lb) return 0;
+      if (!la) return 1;
+      if (!lb) return -1;
+      if (la.y !== lb.y) return la.y - lb.y;
+      return la.x - lb.x;
+    });
+  }, [displayBoxes, layouts, currentBreakpoint]);
 
   // Prepare layouts for react-grid-layout
   const gridLayouts = useMemo(() => {

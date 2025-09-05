@@ -302,34 +302,26 @@ export default function DynamicBoxes({
     });
   }, [displayBoxes, layouts, currentBreakpoint]);
 
-  // Prepare layouts for react-grid-layout
+  // Prepare layouts for react-grid-layout using sorted boxes
   const gridLayouts = useMemo(() => {
     const currentLayout = layouts[currentBreakpoint] || [];
-    
-    // Ensure all display boxes have layout entries
     const layoutMap = new Map(currentLayout.map(layout => [layout.i, layout]));
-    
-    return displayBoxes.map((box, index) => {
+
+    return sortedDisplayBoxes.map((box, index) => {
       const existingLayout = layoutMap.get(box.id);
-      if (existingLayout) {
-        return existingLayout;
-      }
-      
-      // Create default layout for new boxes
-      // Map logical sizes to a 12-column grid widths (allows 1-4 items per row)
+      if (existingLayout) return existingLayout;
+
       const getSizeForBox = (size: string) => {
         switch (size) {
-          case 'large': return { w: 6, h: 2 }; // ~2 per row
-          case 'medium': return { w: 4, h: 2 }; // ~3 per row
-          default: return { w: 3, h: 2 }; // ~4 per row
+          case 'large': return { w: 6, h: 2 };
+          case 'medium': return { w: 4, h: 2 };
+          default: return { w: 3, h: 2 };
         }
       };
 
       const { w, h } = getSizeForBox(box.size);
-
-      // Simple flow layout on a 12-column grid
-      const colsTotal = 12;
-      const placementUnit = 3; // default small width to help initial placements
+      const colsTotal = cols.lg || 12;
+      const placementUnit = 3;
       const x = (index * placementUnit) % colsTotal;
       const y = Math.floor((index * placementUnit) / colsTotal) * 2;
 
@@ -345,11 +337,21 @@ export default function DynamicBoxes({
         maxH: 12,
       };
     });
-  }, [displayBoxes, layouts, currentBreakpoint]);
+  }, [sortedDisplayBoxes, layouts, currentBreakpoint]);
+
+  // Save layouts to localStorage whenever layout changes
+  const saveLayoutsToLocal = useCallback((newLayouts: { [key: string]: BoxLayout[] }) => {
+    try {
+      localStorage.setItem('gridLayout', JSON.stringify(newLayouts));
+    } catch (e) {
+      // ignore
+    }
+  }, []);
 
   const handleLayoutChange = useCallback((layout: Layout[]) => {
+    // Only persist changes when in edit mode (admin) — but still update store
     if (!isEditMode && !showEditButtons) return;
-    
+
     const boxLayouts: BoxLayout[] = layout.map(item => ({
       i: item.i,
       x: item.x,
@@ -361,12 +363,18 @@ export default function DynamicBoxes({
       maxW: item.maxW,
       maxH: item.maxH,
     }));
-    
+
+    const newLayouts = {
+      ...layouts,
+      [currentBreakpoint]: boxLayouts,
+    };
+
     setLayout(currentBreakpoint, boxLayouts);
-  }, [isEditMode, showEditButtons, currentBreakpoint, setLayout]);
+    saveLayoutsToLocal(newLayouts);
+  }, [isEditMode, showEditButtons, currentBreakpoint, setLayout, layouts, saveLayoutsToLocal]);
 
   const handleResizeStop = useCallback((layout: Layout[]) => {
-    console.log('Resize stopped, new layout:', layout); // Debug log
+    console.log('Resize stopped, new layout:', layout);
     handleLayoutChange(layout);
   }, [handleLayoutChange]);
 

@@ -348,30 +348,49 @@ export default function DynamicBoxes({
     }
   }, []);
 
-  const handleLayoutChange = useCallback((layout: Layout[]) => {
-    // Only persist changes when in edit mode (admin) — but still update store
-    if (!isEditMode && !showEditButtons) return;
+  // Build layouts prop to supply to ResponsiveGridLayout
+  const layoutsProp = useMemo(() => ({
+    ...layouts,
+    [currentBreakpoint]: gridLayouts,
+  }), [layouts, currentBreakpoint, gridLayouts]);
 
-    const boxLayouts: BoxLayout[] = layout.map(item => ({
-      i: item.i,
-      x: item.x,
-      y: item.y,
-      w: item.w,
-      h: item.h,
-      minW: item.minW,
-      minH: item.minH,
-      maxW: item.maxW,
-      maxH: item.maxH,
-    }));
+  const handleLayoutChange = useCallback((layout: Layout[] | null, allLayouts?: { [key: string]: Layout[] }) => {
+    // Convert incoming layouts to BoxLayout format and persist
+    const target: { [key: string]: BoxLayout[] } = {};
 
-    const newLayouts = {
-      ...layouts,
-      [currentBreakpoint]: boxLayouts,
-    };
+    if (allLayouts && Object.keys(allLayouts).length > 0) {
+      Object.entries(allLayouts).forEach(([bp, arr]) => {
+        target[bp] = (arr || []).map(item => ({
+          i: (item as any).i,
+          x: (item as any).x,
+          y: (item as any).y,
+          w: (item as any).w,
+          h: (item as any).h,
+          minW: (item as any).minW,
+          minH: (item as any).minH,
+          maxW: (item as any).maxW,
+          maxH: (item as any).maxH,
+        }));
+      });
+    } else if (layout) {
+      target[currentBreakpoint] = layout.map(item => ({
+        i: item.i,
+        x: item.x,
+        y: item.y,
+        w: item.w,
+        h: item.h,
+        minW: item.minW,
+        minH: item.minH,
+        maxW: item.maxW,
+        maxH: item.maxH,
+      }));
+    }
 
-    setLayout(currentBreakpoint, boxLayouts);
-    saveLayoutsToLocal(newLayouts);
-  }, [isEditMode, showEditButtons, currentBreakpoint, setLayout, layouts, saveLayoutsToLocal]);
+    // Apply to store and persist
+    Object.entries(target).forEach(([bp, arr]) => setLayout(bp, arr));
+    const merged = { ...layouts, ...target };
+    saveLayoutsToLocal(merged);
+  }, [currentBreakpoint, setLayout, layouts, saveLayoutsToLocal]);
 
   const handleResizeStop = useCallback((layout: Layout[]) => {
     console.log('Resize stopped, new layout:', layout);
@@ -397,15 +416,15 @@ export default function DynamicBoxes({
     <section className={cn('mx-auto max-w-[1200px] px-4 sm:px-6 mt-8 sm:mt-10', (isEditMode || showEditButtons) && 'admin-edit-mode')}>
       <ResponsiveGridLayout
         className="layout"
-        layouts={{ [currentBreakpoint]: gridLayouts }}
+        layouts={layoutsProp}
         breakpoints={breakpoints}
         cols={cols}
         rowHeight={80}
-        onLayoutChange={(layout) => handleLayoutChange(layout)}
-        onDragStop={(layout) => handleLayoutChange(layout)}
-        onResizeStop={(layout) => handleResizeStop(layout)}
-        isDraggable={isEditMode || showEditButtons}
-        isResizable={isEditMode || showEditButtons}
+        onLayoutChange={(layout, allLayouts) => handleLayoutChange(layout, allLayouts as any)}
+        onDragStop={(layout) => handleLayoutChange(layout, { ...layoutsProp, [currentBreakpoint]: layout } as any)}
+        onResizeStop={(layout) => handleLayoutChange(layout, { ...layoutsProp, [currentBreakpoint]: layout } as any)}
+        isDraggable={true}
+        isResizable={true}
         compactType={(isEditMode || showEditButtons) ? null : 'vertical'}
         preventCollision={false}
         margin={[16, 16]}
@@ -425,7 +444,7 @@ export default function DynamicBoxes({
           }
 
           return (
-            <div key={box.id} className="relative">
+            <div key={box.id} className="relative" data-grid={boxLayout}>
               <DynamicBox
                 box={box}
                 isEditMode={isEditMode}

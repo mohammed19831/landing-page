@@ -13,7 +13,7 @@ import NotFound from "./pages/NotFound";
 import AdminLayout from "./pages/admin";
 import DashboardAdmin from "./pages/admin/DashboardAdmin";
 import SliderAdmin from "./pages/admin/SliderAdmin";
-import BoxesAdmin from "./pages/admin/BoxesAdmin";
+import DynamicBoxesAdmin from "./pages/admin/DynamicBoxesAdmin";
 import LogosAdmin from "./pages/admin/LogosAdmin";
 import ContactAdmin from "./pages/admin/ContactAdmin";
 import {
@@ -74,7 +74,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardAdmin /> },
       { path: "slider", element: <SliderAdmin /> },
-      { path: "boxes", element: <BoxesAdmin /> },
+      { path: "boxes", element: <DynamicBoxesAdmin /> },
       { path: "logos", element: <LogosAdmin /> },
       { path: "contact", element: <ContactAdmin /> },
       { path: "header", element: <HeaderAdmin /> },
